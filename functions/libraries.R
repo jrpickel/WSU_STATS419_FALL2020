@@ -5,6 +5,6 @@ library(MASS)
 
 library(tractor.base)
 
-library(stringer)
+library(stringr)
 library(rvest)
 
