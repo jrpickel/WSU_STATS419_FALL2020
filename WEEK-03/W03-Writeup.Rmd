@@ -22,28 +22,160 @@ number_sections: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r message=FALSE,warning=FALSE}
+```{r}
 library(devtools)
-github.path ="https://raw.githubusercontent.com/jrpickel/WSU_STATS419_FALL2020/";
-source_url(paste0(github.path,"master/functions/libraries.R"));
+github.path = "https://raw.githubusercontent.com/jrpickel/WSU_STATS419_FALL2020/";
+source_url(paste0(github.path,"master/functions/libraries.R"),);
+source_url( paste0(github.path,"master/functions/functions-imdb.R"),);
+```
+# Martrix
+Create the "rotate matrix" functions as described in lectures.  Apply to the example "myMatrix".
+
+```{r Matrix rotation}
+source_url( paste0(github.path,"master/functions/functions-matrix.R"),);
+
+myMatrix = matrix ( c (
+   1, 0, 2,
+   0, 3, 0,
+   4, 0, 5
+ ), nrow=3, byrow=T);
+
+```
+## Matrix
+```{r}
+rotateMatrix90(myMatrix)
+```
+\newpage
+## Matrix
+```{r}
+rotateMatrix180(myMatrix)
+```
+## Matrix
+```{r}
+rotateMatrix270(myMatrix)
+```
+# Iris graphic
+Recreate the graphic for the IRIS Data Set using R.  Same titles, same scales, same colors.
+## Iris graphic
+```{r, fig.cap = "Iris data generated using `plot()`", fig.dim=c(6,6)}
+library(datasets)
+data("iris")
+
+plot(iris[1:4],main="Iris Data (red=setosa,green=versicolor,blue=virginica)",col=c("black"),
+pch=21,bg=c("red","blue","#258425")[iris$Species])
+```
+  
+# Iris Summary
+Write 2-3 sentences concisely defining the IRIS Data Set.
+
+## Iris Summary
+The Iris flower dataset contains 150 total data points, 50 data points for each of the three Iris flowers (setosa, virginica, versicolor). The data set records the measurement of four variables (Petal Length, Pedal Width, Sepal Width, Sepal length) for each of the 50 samples. The data set also contains a variable “class” indicating what species the measurements belongs to.
+
+# Clean Personality dataset
+In the homework, for these tasks, report how many records your raw dataset had and how many records your clean dataset has.
+
+## Clean Personality dataset
+```{r}
+source_url( paste0(github.path,"master/WEEK-03/functions/functions-CleanData.R"),  )
+
+personality.raw = readFile(paste0(github.path,"/master/datasets/personality-raw.txt"))
+
+observations.raw = nrow(personality.raw)
+observations.clean = nrow(cleanData(personality.raw))
+```
+The raw dataset has `r observations.raw` reords
+\newline
+The clean dataset has `r observations.clean` reords
+
+# Functions and Z-score
+Write functions for doSummary and sampleVariance and doMode ... test these functions in your homework on the "monte.shaffer\@gmail.com" record from the clean dataset. Report your findings.  For this "monte.shaffer\@gmail.com" record, also create z-scores.  Plot(x,y) where x is the raw scores for "monte.shaffer\@gmail.com" and y is the z-scores from those raw scores. Include the plot in your assignment, and write 2 sentences describing what pattern you are seeing and why this pattern is present.
+
+## Functions doSummary(), doMode()
+```{r}
+source_url( paste0(github.path,"master/WEEK-03/functions/functions-CleanData.R"),  )
+source_url( paste0(github.path,"master/WEEK-03/functions/functions-summary.R"),  )
+
+personality.raw = readFile(paste0(github.path,"master/datasets/personality-raw.txt"))
+personality.clean = cleanData(personality.raw)
+record = retrieveTopRecord(personality.clean)
+
+doSummary(record)
+doMode(record)
 ```
 
-```{r cars}
-summary(cars)
+## Z-scores
+```{r, fig.cap = "Relationship between z-scores and raw scores"}
+z.score = (record-mean(record))/sd(record)
+plot(record,z.score,main="Z-score and raw score relationship",xlab="Raw score",ylab="Z-score")
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+# Denzel Washington vs. Will Smith
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Compare Will Smith and Denzel Washington. You will have to create a new variable \$millions.2000 that converts each movie's \$millions based on the \$year of the movie, so all dollars are in the same time frame. You will need inflation data from about 1980-2020 to make this work.
+
+## Side by Side comparison before conversion
+```{r,fig.cap = "Side by Side comparison of Will Smith and Denzel Washington before conversion"}
+source_url( paste0(github.path,"master/functions/functions-imdb.R"),  );
+
+nmid = "nm0000226";
+will = grabFilmsForPerson(nmid);
+
+nmid = "nm0000243";
+denzel = grabFilmsForPerson(nmid);
+
+par(mfrow=c(1,2))
+boxplot(denzel$movies.50$millions,xlab="Denzel Washington",ylab="Raw Millions",main="Movie Revenue");
+boxplot(will$movies.50$millions,xlab = "Will Smith",ylab="Raw Millions", main="Movie Revenue");
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Converting millions into year 2000 dollars
+```{r}
+source_url( paste0(github.path,"/master/WEEK-03/functions/functions-inflation.R"),  );
+
+will.converted = convertMillions(will,2000)
+denzel.converted = convertMillions(denzel,2000)
+
+# show top 5 rows
+will.converted$movies.50[1:5,]
+```
+By converting all the revenue dollars from various movies across different years to a constant year allows us to compare apples to apples. If we do not convert the revenue to the same year our data will be skewed. I used inflation data from 1980 to 2020 by scraping the data from  the web using code provided by Monte J. Shaffer to convert every year into the year 2000 dollars. After the conversion step we see when comparing Denzel Washington to Will Smith we can see most movies featuring Will Smith revenue higher than Denzel Washington. Will Smith also has a higher max revenue than Denzel Washington and the median revenue between the two actors is almost equal. We can also see that Will Smith has an outlier, meaning one movie generated way more revenue when compared to all his other top 50 movies.
+
+
+# Denzel vs. Will Side by Side comparison of several Variables
+
+Build side-by-side box plots on several of the variables (including #6) to compare the two movie stars.  After each box plot, write 2+ sentences describing what you are seeing, and what conclusions you can logically make. You will need to review what the box plot is showing with the box portion, the divider in the box, and the whiskers.
+
+## Denzel vs. Will Side by Side comparison of revenue after conversion
+
+Comparing the revenue generated from movies featuring Denzel Washington to Will Smith using a boxplot. We can see from Figure 4. the median for Will Smith is slightly higher than Denzel Washington. The actors have a median revenue of 56.5897 and 52.4536 million dollars, respectively. Fifty percent of the revenue for Denzel Washington is between 22.3942 and 70.0587 million dollars. Fifty percent of the revenue generated by Will smith is between 30.4543 and 137.6564 million dollars. The max revenue for Denzel is 120.0872 while Will Smith has a max of 336.0260 million dollars. From these statistics we can conclude Will Smith has been featured in more films with higher revenue than Denzel Washington.
+
+```{r,fig.cap = "Side by Side comparison of Will and Denzel after conversion"}
+# Revenue in year 2000 dollars comparison
+boxplot(denzel.converted$movies.50$millions.2000,will.converted$movies.50$millions.2000,
+names=c("Denzel Washington","Will Smith"),main="Movie revenue in year 2000 dollars",
+ylab= "Revenue (millions)",xlab = "Actors");
+```
+
+## Denzel vs. Will Side by Side comparison of ratings
+
+Comparing the ratings from movies featuring Denzel Washington to Will Smith using a boxplot. We can see from Figure 5. the average ratings for films featuring Will Smith is slightly lower than Denzel Washington. The actors have an average rating of 6.326 and 6.852, respectively. Fifty percent of ratings data for Denzel Washington is between 6.525 and 7.3. Fifty percent of the ratings data for Will smith is between 6.0 and 6.875. The max rating for Denzel is a 7.8 while Will Smith has a max rating of 8.0. From these statistics we can conclude Denzel Washington has been in more movies with higher ratings than Will Smith has.
+
+```{r,fig.cap = "Side by Side comparison of ratings between Will and Denzel"}
+# Ratings comparison 
+boxplot(denzel.converted$movies.50$ratings,will.converted$movies.50$ratings,
+names=c("Denzel Washington","Will Smith"),main="Movie ratings",
+ylab= "Ratings",xlab = "Actors")
+```
+
+## Denzel vs. Will Side by Side comparison of runtime
+
+Comparing the runtime from movies featuring Denzel Washington to Will Smith using a boxplot. We can see from Figure 6. the median for Will Smith is slightly lower than Denzel Washington. The actors have a median runtime of 113 and 118 minutes, respectively. Fifty percent of the runtime for Denzel Washington is between 106 and 129 minutes. Fifty percent of the runtime for Will smith is between 100.2 and 123 minutes. The max runtime for Denzel is 202 minutes while Will Smith has a max of 157 minutes. From these statistics we can conclude that Denzel Washington has been in movies with longer runtimes than movies featuring Will Smith.
+
+```{r,fig.cap = "Side by Side comparison of runtime between Will and Denzel"}
+# Runtime comparison
+boxplot(denzel.converted$movies.50$minutes,will.converted$movies.50$minutes,
+names=c("Denzel Washington","Will Smith"),main="Movie runtime minutes",
+ylab= "Minutes",xlab = "Actors")
+```
+```
