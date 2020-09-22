@@ -8,7 +8,7 @@
 \textheight=9.0in       %
 \headsep=0.25in         %
 
-
+\usepackage{caption}
 \usepackage{graphicx,float,wrapfig}
 \usepackage{moreverb} % monospace
 \usepackage{fancyhdr} % fancy header 
@@ -64,6 +64,7 @@ $endif$
 \newcommand{\hmwkInstructor}{Instructor: $instructor$}
 \newcommand{\hmwkDate}{$date$}
 
+\setlength{\abovecaptionskip}{0.5pt}
 
 \pagestyle{fancy}   
 \lhead{\hmwkCourseShort}
@@ -76,7 +77,7 @@ $endif$
 
 
 \title{\hmwkCourse \\ \hmwkTitle}
-\author{\hmwkAuthor \\ (\hmwkEmail) \\ \hmwkWSU \\[0.5in] \hmwkInstructor }
+\author{\hmwkAuthor \\ \hmwkEmail \\ [0.20in] \hmwkInstructor }
 \date{\hmwkDate}
 
 
@@ -110,7 +111,6 @@ $endif$
 \begin{document}
 
 \maketitle
-
 
 
 $body$
